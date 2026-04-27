@@ -1,0 +1,13 @@
+[project]
+name = "skills-ai-agent-manager"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "psycopg2-binary>=2.9.12",
+    "psycopg[binary]>=3.3.3",
+    "pugsql>=0.3.7",
+    "python-dotenv>=1.2.2",
+    "streamlit>=1.56.0",
+]
