@@ -11,13 +11,12 @@ queries.connect(os.getenv('DATABASE_URL'))
 
 st.title("Delete Skills")
 
-skills = queries.get_full_skills_data().mappings().all()
+skills = queries.get_all_skills_data().mappings().all()
 df = pd.DataFrame(skills)
 
 # ======================
 # 1. DATAFRAME VIEW ONLY
 # ======================
-st.divider()
 st.subheader("All Skills")
 
 st.dataframe(df, width="stretch")
