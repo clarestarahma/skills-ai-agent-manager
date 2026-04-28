@@ -34,23 +34,17 @@ UPDATE skills SET when_to_use = :when_to_use WHERE id = :id;
 
 -- :name update_skills_example_queries
 UPDATE skills 
-SET example_queries = ARRAY (
-  SELECT DISTINCT UNNEST(COALESCE(example_queries, '{}') || string_to_array(:example_queries, ','))
-) 
+SET example_queries = COALESCE(example_queries, '{}') || string_to_array(:example_queries, ',')
 WHERE id = :id;
 
 -- :name update_skills_tags
 UPDATE tags 
-SET tags = ARRAY (
-  SELECT DISTINCT UNNEST(COALESCE(tags, '{}') || string_to_array(:tags, ','))
-)  
+SET tags = COALESCE(tags, '{}') || string_to_array(:tags, ',')
 WHERE id = :id;
 
 -- :name update_skills_tools
 UPDATE tools 
-SET tools = ARRAY (
-  SELECT DISTINCT UNNEST(COALESCE(tools, '{}') || string_to_array(:tools, ','))
-) 
+SET tools = COALESCE(tools, '{}') || string_to_array(:tools, ',')
 WHERE id = :id;
 
 -- :name update_skills_instructions
