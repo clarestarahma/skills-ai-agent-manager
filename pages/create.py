@@ -2,6 +2,7 @@ import streamlit as st
 import pugsql
 import os
 from dotenv import load_dotenv
+from utils.embedding import getEmbedding
 
 load_dotenv()
 

@@ -16,9 +16,9 @@ VALUES (
   :name,
   :description,
   :when_to_use,
-  string_to_array(:example_queries, ','),
-  string_to_array(:tags, ','),
-  string_to_array(:tools, ','),
+  regexp_split_to_array(:example_queries, '\n\n'),
+  regexp_split_to_array(:tags, '\n\n'),
+  regexp_split_to_array(:tools, '\n\n'),
   :instructions,
   :embedding
 );
@@ -34,17 +34,17 @@ UPDATE skills SET when_to_use = :when_to_use WHERE id = :id;
 
 -- :name update_skills_example_queries
 UPDATE skills 
-SET example_queries = COALESCE(example_queries, '{}') || string_to_array(:example_queries, ',')
+SET example_queries = COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_tags
 UPDATE tags 
-SET tags = COALESCE(tags, '{}') || string_to_array(:tags, ',')
+SET tags = COALESCE(tags, '{}') || regexp_split_to_array(:tags, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_tools
 UPDATE tools 
-SET tools = COALESCE(tools, '{}') || string_to_array(:tools, ',')
+SET tools = COALESCE(tools, '{}') || regexp_split_to_array(:tools, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_instructions
