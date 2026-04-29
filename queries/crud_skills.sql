@@ -34,26 +34,17 @@ UPDATE skills SET when_to_use = :when_to_use WHERE id = :id;
 
 -- :name update_skills_example_queries
 UPDATE skills 
-SET example_queries = (
-  SELECT array_agg(DISTINCT x) 
-  FROM unnest(COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')) AS x
-)
+SET example_queries = regexp_split_to_array(:example_queries, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_tags
-UPDATE tags 
-SET tags = (
-  SELECT array_agg(DISTINCT x) 
-  FROM unnest(COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')) AS x
-)
+UPDATE skills 
+SET tags = regexp_split_to_array(:tags, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_tools
-UPDATE tools 
-SET tools = (
-  SELECT array_agg(DISTINCT x) 
-  FROM unnest(COALESCE(tools, '{}') || regexp_split_to_array(:tools, '\n\n')) AS x
-)
+UPDATE skills 
+SET tools = regexp_split_to_array(:tools, '\n\n')
 WHERE id = :id;
 
 -- :name update_skills_instructions

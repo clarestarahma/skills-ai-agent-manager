@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 import pandas as pd
-from utils.list_to_string import format_list_to_string
+from utils.list_to_string import format_list_for_forms
 from utils.embedding import getEmbeddingOpenAI
 import time
 
@@ -41,9 +41,9 @@ if not df.empty:
     name = st.text_input("Name", value=skill.get("name"))
     desc = st.text_area("Description", value=skill.get("description"))
     when = st.text_area("When to use", value=skill.get("when_to_use"))
-    queries = st.text_area("Add More example queries", help="Gunakan Enter 2x untuk memisahkan antar tag", placeholder=format_list_to_string(skill.get("example_queries")))
-    tags = st.text_area("Add More Tags", help="Gunakan Enter 2x untuk memisahkan antar tag", placeholder=format_list_to_string(skill.get('tags')))
-    tools = st.text_area("Add More Tools", help="Gunakan Enter 2x untuk memisahkan antar tool", placeholder=format_list_to_string(skill.get("tools")))
+    queries = st.text_area("Add More example queries", help="use two enter to separate between query", value=format_list_for_forms(skill.get("example_queries")))
+    tags = st.text_area("Add More Tags", help="use two enter to separate between tag", value=format_list_for_forms(skill.get('tags')))
+    tools = st.text_area("Add More Tools", help="use two enter to separate between tool", value=format_list_for_forms(skill.get("tools")))
     instr = st.text_area("Instructions", value=skill.get("instructions"))
 
     if st.button("Update"):
