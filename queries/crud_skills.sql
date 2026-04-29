@@ -16,11 +16,11 @@ VALUES (
   :name,
   :description,
   :when_to_use,
-  regexp_split_to_array(:example_queries, '\n\n'),
-  regexp_split_to_array(:tags, '\n\n'),
-  regexp_split_to_array(:tools, '\n\n'),
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:example_queries, '\n\n')) AS x),
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tags, '\n\n')) AS x),
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tools, '\n\n')) AS x),
   :instructions,
-  :embedding
+  CAST(:embedding AS vector)
 );
 
 -- :name update_skills_name
@@ -34,17 +34,26 @@ UPDATE skills SET when_to_use = :when_to_use WHERE id = :id;
 
 -- :name update_skills_example_queries
 UPDATE skills 
-SET example_queries = COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')
+SET example_queries = (
+  SELECT array_agg(DISTINCT x) 
+  FROM unnest(COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')) AS x
+)
 WHERE id = :id;
 
 -- :name update_skills_tags
 UPDATE tags 
-SET tags = COALESCE(tags, '{}') || regexp_split_to_array(:tags, '\n\n')
+SET tags = (
+  SELECT array_agg(DISTINCT x) 
+  FROM unnest(COALESCE(example_queries, '{}') || regexp_split_to_array(:example_queries, '\n\n')) AS x
+)
 WHERE id = :id;
 
 -- :name update_skills_tools
 UPDATE tools 
-SET tools = COALESCE(tools, '{}') || regexp_split_to_array(:tools, '\n\n')
+SET tools = (
+  SELECT array_agg(DISTINCT x) 
+  FROM unnest(COALESCE(tools, '{}') || regexp_split_to_array(:tools, '\n\n')) AS x
+)
 WHERE id = :id;
 
 -- :name update_skills_instructions

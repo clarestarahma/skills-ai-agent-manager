@@ -4,6 +4,8 @@ import os
 import streamlit as st
 import pandas as pd
 from utils.list_to_string import format_list_to_string
+from utils.embedding import getEmbeddingOpenAI
+import time
 
 load_dotenv()
 
@@ -36,41 +38,64 @@ if not df.empty:
     # 3. EDIT FORM
     # ======================
     st.subheader("Edit Skill")
-    name = st.text_input("Name", placeholder=skill.get("name"))
-    desc = st.text_area("Description", placeholder=skill.get("description"))
-    when = st.text_area("When to use", placeholder=skill.get("when_to_use"))
-    queries = st.text_area("Example to queries", placeholder=format_list_to_string(skill.get("example_queries")))
-    tags = st.text_area("Tags", placeholder=format_list_to_string(skill.get('tags')))
-    tools = st.text_area("Tools", placeholder=format_list_to_string(skill.get("tools")))
-    instr = st.text_area("Instructions", placeholder=skill.get("instructions"))
-    embedding = st.text_area("Embedding", placeholder=skill.get("embedding"))
+    name = st.text_input("Name", value=skill.get("name"))
+    desc = st.text_area("Description", value=skill.get("description"))
+    when = st.text_area("When to use", value=skill.get("when_to_use"))
+    queries = st.text_area("Add More example queries", help="Gunakan Enter 2x untuk memisahkan antar tag", placeholder=format_list_to_string(skill.get("example_queries")))
+    tags = st.text_area("Add More Tags", help="Gunakan Enter 2x untuk memisahkan antar tag", placeholder=format_list_to_string(skill.get('tags')))
+    tools = st.text_area("Add More Tools", help="Gunakan Enter 2x untuk memisahkan antar tool", placeholder=format_list_to_string(skill.get("tools")))
+    instr = st.text_area("Instructions", value=skill.get("instructions"))
 
     if st.button("Update"):
+        try:
+            changes = []
 
-        if name != skill["name"]:
-            db.update_skills_name(id=skill['id'], name=name)
+            #  name
+            if name and name != skill["name"]:
+                db.update_skills_name(id=skill['id'], name=name.strip())
+                changes.append("name")
 
-        if desc != skill["description"]:
-            db.update_skills_description(id=skill['id'], description=desc)
+            #  description
+            if desc and desc != skill["description"]:
+                db.update_skills_description(id=skill['id'], description=desc.strip())
+                changes.append("desc")
 
-        if when != skill["when_to_use"]:
-            db.update_skills_when_to_use(id=skill['id'], when_to_use=when)
+            #  when to use
+            if when and when != skill["when_to_use"]:
+                db.update_skills_when_to_use(id=skill['id'], when_to_use=when.strip())
+                changes.append()
 
-        if queries != format_list_to_string(skill['example_queries']):
-            db.update_skills_example_queries(id=skill['id'], example_queries=queries)
+            # example queries
+            if queries.strip():
+                db.update_skills_example_queries(id=skill['id'], example_queries=queries.strip())
+                changes.append("example_queries")
 
-        if tags != format_list_to_string(skill["tags"]):
-            db.update_skills_tags(id=skill['id'], tags=tags)
+            # tags
+            if tags.strip():
+                db.update_skills_tags(id=skill['id'], tags=tags.strip())
+                changes.append("tags")
 
-        if tags != format_list_to_string(skill["tools"]):
-            queries.update_skills_tools(id=skill['id'], tools=tools)
+            # tools
+            if tools.strip():
+                db.update_skills_tools(id=skill['id'], tools=tools.strip())
+                changes.append("tools")
 
-        if instr != skill["instructions"]:
-            db.update_skills_instructions(id=skill['id'], instructions=instr)
-
-        if embedding != skill["embedding"]:
-            db.update_skills_instructions(id=skill['id'], embedding=embedding)
-
-        st.cache_data.clear()
-        st.success("Updated!")
-        st.rerun()
+            #  Instruction and embedding
+            if instr and instr != skill["instructions"]:
+                clean_instr = instr.strip()
+                db.update_skills_instructions(id=skill['id'], instructions=clean_instr)
+                vector_data = getEmbeddingOpenAI(clean_instr)
+                if vector_data:
+                    db.update_skills_embedding(id=skill['id'], embedding=vector_data)
+                changes.append("instructions")
+            
+            if changes:
+                st.cache_data.clear()
+                detail_changes = ", ".join(changes)
+                st.success(f"Skill updated successfully: {detail_changes}")
+                time.sleep(2)
+                st.rerun()
+            else:
+                st.info("No changes detected")
+        except Exception as e:
+            st.error(f"Failed to update skill. Error: {e}")

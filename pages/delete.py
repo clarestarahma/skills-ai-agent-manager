@@ -2,6 +2,7 @@ import streamlit as st
 import pugsql
 import os
 import pandas as pd
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,15 +27,27 @@ names = list(skill_map.keys())
 
 selected = st.multiselect("Pilih skill yang mau dihapus", names)
 
-if selected:
-    st.write("Akan dihapus:")
-    for name in selected:
-        st.write("•", name)
+confirm = st.checkbox("I am sure I want to delete these skills", key="confirm_delete")
 
 if st.button("Delete Selected"):
-    for name in selected:
-        skill_id = skill_map[name]["id"]
-        queries.delete_skill(id=skill_id)
+    if confirm:
+        if not selected:
+            st.warning("Please select at least one skill to delete.")
+        else:
+            try:
+                deleted_names = []
+                for name in selected:
+                    skill_id = skill_map[name]["id"]
+                    queries.delete_skill(id=skill_id)
+                    deleted_names.append(name)
+                st.session_state["confirm_delete"] = False
+                st.cache_data.clear()
 
-    st.success("Deleted!")
-    st.rerun()
+                names_str = ", ".join(deleted_names)
+                st.success(f"Successfully deleted: {names_str}")
+                time.sleep(2)
+                st.rerun()
+            except Exception as e:
+                st.error(f"Failed to delete skills. Error: {e}")
+    else:
+        st.warning("You must confirm by checking the box before deleting")
