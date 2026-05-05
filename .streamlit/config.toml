@@ -1,0 +1,22 @@
+[theme]
+# Gunakan base dark supaya widget otomatis menyesuaikan
+base="dark" 
+
+# Warna aksen (Tombol, Slider, Link). Emas redup/Gold biar elegan.
+primaryColor="#D4AF37" 
+
+# Background utama hitam pekat
+backgroundColor="#0D0D0D" 
+
+# Background sidebar & widget (Abu-abu sangat gelap agar ada dimensi)
+secondaryBackgroundColor="#1A1A1A" 
+
+# Warna teks (Putih tulang agar tidak terlalu silau)
+textColor="#E0E0E0" 
+
+# Font sans serif biar modern
+font="sans serif"
+
+[client]
+# Tetap false supaya navigasi double-mu hilang
+showSidebarNavigation = false

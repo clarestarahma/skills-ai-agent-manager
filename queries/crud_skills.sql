@@ -9,18 +9,16 @@ INSERT INTO skills (
   example_queries,
   tags,
   tools,
-  instructions, 
   embedding
 )
 VALUES (
   :name,
   :description,
   :when_to_use,
-  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:example_queries, '\n\n')) AS x),
-  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tags, '\n\n')) AS x),
-  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tools, '\n\n')) AS x),
-  :instructions,
-  CAST(:embedding AS vector)
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:example_queries, '\n\n')) x WHERE x <> ''),
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tags, '\n\n')) x WHERE x <> ''),
+  (SELECT array_agg(DISTINCT x) FROM unnest(regexp_split_to_array(:tools, '\n\n')) x WHERE x <> ''),
+  :embedding
 );
 
 -- :name update_skills_name
@@ -44,11 +42,12 @@ WHERE id = :id;
 
 -- :name update_skills_tools
 UPDATE skills 
-SET tools = regexp_split_to_array(:tools, '\n\n')
+SET tools = (
+    SELECT array_agg(DISTINCT x) 
+    FROM unnest(regexp_split_to_array(:tools, '\n\n')) x 
+    WHERE x <> ''
+)
 WHERE id = :id;
-
--- :name update_skills_instructions
-UPDATE skills SET instructions = :instructions WHERE id = :id;
 
 -- :name update_skills_embedding
 UPDATE skills SET embedding = :embedding WHERE id = :id;
